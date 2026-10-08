@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Build the static site in docs/ from the repository: overview page, paper (PDF + HTML), data files.
 Run from the repo root:  python3 site/build.py
-Env: SITE_REPO (e.g. https://github.com/OWNER/soft-to-rigid-packing), SUBMISSION_STATUS."""
+Env: SITE_REPO (e.g. https://github.com/yoheinakajima/soft-to-rigid-packing), SUBMISSION_STATUS."""
 import json, os, re, shutil, subprocess, datetime, glob
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); os.chdir(ROOT)
 D = 'docs'; os.makedirs(f'{D}/data', exist_ok=True)
-REPO = os.environ.get('SITE_REPO', 'https://github.com/OWNER/soft-to-rigid-packing')
+REPO = os.environ.get('SITE_REPO', 'https://github.com/yoheinakajima/soft-to-rigid-packing')
 def git(*a):
     try: return subprocess.check_output(['git', *a], stderr=subprocess.DEVNULL).decode().strip()
     except Exception: return ''

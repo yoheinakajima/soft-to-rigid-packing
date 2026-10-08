@@ -17,11 +17,11 @@
   <h1>Twelve unit cubes fit in a cube of side 2.93151</h1>
   <p class="lede">Start with balls, squeeze them into a box, then harden them into cubes while the walls keep pushing. On 8 October 2026 this found a packing of 12 unit cubes 0.0012533 smaller than the July 2026 record. Everything needed to check it is below and in the repository.</p>
   <div class="links">
-    <a href="https://raw.githubusercontent.com/OWNER/soft-to-rigid-packing/main/claims/cubincub_n12/cubincub_n12.json">Coordinates (JSON)</a>
+    <a href="https://raw.githubusercontent.com/yoheinakajima/soft-to-rigid-packing/b78a44b18c2f2d0cd7da6bba1c088eabe7ffa95c/claims/cubincub_n12/cubincub_n12.json">Coordinates (JSON)</a>
     <a href="#verify">Verify</a>
     <a href="paper.html">Paper</a>
     <a href="paper.pdf">PDF</a>
-    <a href="https://github.com/OWNER/soft-to-rigid-packing">Repository</a>
+    <a href="https://github.com/yoheinakajima/soft-to-rigid-packing">Repository</a>
   </div>
   <div class="nums">
     <div><b>2.9315185094797</b><span>side, s_full (Friedman display 2.93151+)</span></div>
@@ -62,7 +62,7 @@
   <p><button class="runbtn" id="runverify" type="button">Check the claim file</button></p>
   <div class="out" id="vout">Loads the JSON from this site and runs the 15-axis test on all 66 pairs.</div>
   <p>Or from the repository:</p>
-<pre>git clone https://github.com/OWNER/soft-to-rigid-packing.git && cd soft-to-rigid-packing
+<pre>git clone https://github.com/yoheinakajima/soft-to-rigid-packing.git && cd soft-to-rigid-packing
 python3 verify.py claims/cubincub_n12/cubincub_n12.json        # standard library only, exits 1 on failure
 python3 certify_exact.py claims/cubincub_n12/cubincub_n12.json # exact rational arithmetic
 ./scripts/reproduce_n12.sh                                      # rerun the search from seed 52</pre>
@@ -90,17 +90,17 @@ python3 certify_exact.py claims/cubincub_n12/cubincub_n12.json # exact rational 
     <li class="key"><div class="when">8 Oct · cubes, n = 9–12</div><h3>Same method, one dimension up</h3><p>Friedman's n = 9 packing is found 16 times in 64. At n = 12, seed 52 lands below the July 2026 record.</p></li>
     <li class="key"><div class="when">8 Oct · claim</div><h3>Certified and published</h3><p>Clearance of 10⁻⁶ added, exact certificate passed, file in the record's format. Submitted to Erich Friedman's catalogue: pending.</p></li>
   </ol>
-  <p class="cap">Every experiment, including dead ends, is in <a href="https://github.com/OWNER/soft-to-rigid-packing/blob/main/EXPERIMENT_LOG.md">EXPERIMENT_LOG.md</a>.</p>
+  <p class="cap">Every experiment, including dead ends, is in <a href="https://github.com/yoheinakajima/soft-to-rigid-packing/blob/main/EXPERIMENT_LOG.md">EXPERIMENT_LOG.md</a>.</p>
 </section>
 
 <section class="paper">
   <h2>Paper</h2>
   <p><i>Twelve Unit Cubes in a Cube of Side 2.9315, Found by Hardening Balls into Cubes</i>. Read it <a href="paper.html">online</a>, with the interactive 3D figure, or as a <a href="paper.pdf">PDF</a>. Both are rebuilt from <code>paper/main.tex</code> on every commit, so these links always point to the latest draft.</p>
-  <div class="stamp">built from commit uncommitted · 2026-10-08 16:31 UTC</div>
+  <div class="stamp">built from commit b78a44b · 2026-10-08 16:43 UTC</div>
 </section>
 
 <footer>
-  Yohei Nakajima. Code, experiments and verification were developed with Claude (Anthropic). MIT licence. <a href="https://github.com/OWNER/soft-to-rigid-packing">Repository</a>.
+  Yohei Nakajima. Code, experiments and verification were developed with Claude (Anthropic). MIT licence. <a href="https://github.com/yoheinakajima/soft-to-rigid-packing">Repository</a>.
 </footer>
 </main>
 
