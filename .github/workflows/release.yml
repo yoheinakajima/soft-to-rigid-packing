@@ -1,7 +1,10 @@
-# Pushing a tag v* verifies the claim and publishes a GitHub release (which Zenodo archives with a DOI).
+# Pushing a tag v* (or running it manually with a tag) verifies the claim and publishes a GitHub release (which Zenodo archives with a DOI).
 name: release
 on:
   push: { tags: ['v*'] }
+  workflow_dispatch:
+    inputs:
+      tag: { description: "Release tag, e.g. v1.0.0", required: true }
 permissions: { contents: write }
 jobs:
   release:
@@ -14,9 +17,11 @@ jobs:
           python3 verify.py claims/cubincub_n12/cubincub_n12.json
           python3 certify_exact.py claims/cubincub_n12/cubincub_n12.json
       - name: Publish release
-        env: { GH_TOKEN: "${{ github.token }}" }
+        env:
+          GH_TOKEN: "${{ github.token }}"
+          TAG: "${{ github.event.inputs.tag || github.ref_name }}"
         run: |
-          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME — 12 cubes, s = 2.93151+" \
+          gh release create "$TAG" --target "$GITHUB_SHA" --title "$TAG — 12 cubes, s = 2.93151+" \
             --notes-file .github/RELEASE_NOTES.md \
             paper/main.pdf#paper.pdf \
             claims/cubincub_n12/cubincub_n12.json claims/cubincub_n12/cubincub_n12.gif
