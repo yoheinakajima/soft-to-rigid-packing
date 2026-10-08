@@ -5,7 +5,7 @@
 | Friedman's catalogue | Record entry for n = 12 | Emailed 8 Oct 2026 |
 | Zenodo | DOI for release v1.0.0 (code, claim file, paper) | Minted: 10.5281/zenodo.23248095 (v1.0.0); concept DOI 10.5281/zenodo.23248094 |
 | arXiv | Full paper (`paper/main.tex`) | Package ready; on hold until Geombinatorics responds |
-| Geombinatorics | Short note (`paper/geombinatorics/note.tex`) | Gmail draft to go@uccs.edu ready; needs signed copyright form attached |
+| Geombinatorics | Short note (`paper/geombinatorics/note.tex`) | Signed form filled 8 Oct 2026 (kept out of the repo); Gmail draft to asoifer@mail.uccs.edu, cc go@uccs.edu |
 | E-JC | Not now | See below |
 
 ## Decision: Geombinatorics, not E-JC
@@ -31,7 +31,7 @@
 
 - **Manuscript:** `paper/geombinatorics/note.pdf` (4 pages, built to the journal's spec: 8.5 × 5.5 in landscape, margins 0.35 in / 0.5 in bottom, Times 11 pt, title in bold capitals 14 pt, no page numbers).
 - **Also required:** a signed copyright form (link on https://geombina.uccs.edu/ under Submissions).
-- **Send to:** the site lists only a general address, go@uccs.edu. Confirm the submissions address with the editor, Alexander Soifer, before sending.
+- **Send to:** asoifer@mail.uccs.edu (the address printed on the journal's copyright form), cc go@uccs.edu (the only address on the site).
 - **Cover note (draft):**
 
   > Dear Professor Soifer,
