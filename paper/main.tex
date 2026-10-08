@@ -9,7 +9,7 @@
 
 \title{Twelve Unit Cubes in a Cube of Side 2.9315,\\ Found by Hardening Balls into Cubes}
 \author{Yohei Nakajima\thanks{\todo{affiliation and contact}. Experiments, code and verification were developed with the assistance of Claude (Anthropic); see the acknowledgements.}}
-\date{\todo{date}}
+\date{8 October 2026}
 
 \begin{document}
 \maketitle
@@ -54,9 +54,9 @@ Twelve unit cubes fit in a cube of side $2.9315185094797$ with pairwise and wall
 \end{theorem}
 \noindent\emph{Certificate.} The claim file (\texttt{claims/cubincub\_n12/cubincub\_n12.json}, Table~\ref{tab:coords}) lists one pose $[x,y,z,q_w,q_x,q_y,q_z]$ per cube, the format of the previous record file \cite{hyra}. It was obtained from the tightened packing (side $2.931514577965$, with touching contacts) by spreading centres by a factor $1+1.0\cdot10^{-6}$ until every pair is separated by $10^{-6}$, adding a $10^{-6}$ wall gap and rounding the side up. Two checks pass. (i) A floating-point 15-axis separating-axis test (\texttt{verify.py}, 30 lines): minimum wall gap $1.000000000\cdot10^{-6}$, minimum pair gap $1.000000001\cdot10^{-6}$. (ii) An exact check (\texttt{certify\_exact.py}): every number is converted to a rational, rotations are the exactly orthogonal $H(q)/|q|^2$, every corner lies in $[0,s]^3$ and every pair is strictly separated by an explicit rational plane.
 
-Four cubes are exactly axis-aligned, two are tilted by less than $1^\circ$, and six are tilted by $9^\circ$ or more (Figure~\ref{fig:n12}). Several quaternions have repeated components (e.g.\ cube 1: $(0.58389,-0.58389,-0.39884,-0.39884)$), suggesting a closed form that we have not derived. \todo{attempt exact algebraic value from the active contact graph.}
+Four cubes are exactly axis-aligned, two are tilted by less than $1^\circ$, and six are tilted by $9^\circ$ or more (Figure~\ref{fig:n12}). Several quaternions have repeated components (e.g.\ cube 1: $(0.58389,-0.58389,-0.39884,-0.39884)$), suggesting a closed form that we have not derived. We have not derived it.
 
-\paragraph{How it was found.} Seed 52 of the first 64 ball$\to$cube starts with annealing ended at legalized side $2.931821$; exact tightening lowered it to $2.931514577965$. A second start (seed 83) ended at $2.931910$ and tightens to $2.931619541$: a distinct local optimum, also below the catalogue. Two of the first 128 starts land below $2.93277$. The rigid control's best of 32 starts is $2.99257$.
+\paragraph{How it was found.} Seed 52 of the first 64 ball$\to$cube starts with annealing ended at legalized side $2.931821$; exact tightening lowered it to $2.931514577965$. A second start (seed 83) ended at $2.931910$ and tightens to $2.931619541$: a distinct local optimum, also below the catalogue. Two of 192 starts land below $2.93277$. The rigid control's best of 32 starts is $2.99257$.
 
 \begin{figure}[t]\centering
 \includegraphics[width=\linewidth]{figures/n12_views.pdf}
@@ -70,9 +70,9 @@ $n$ & catalogue & starts (ball / rigid) & best ball$\to$cube & best rigid & matc
 9 & $2.70711$ & 64 / 32 & $2.707107$ & $2.707107$ & 16 / 5\\
 10 & $2.70711$ & 64 / 32 & $2.767767$ & $2.894428$ & 0 / 0\\
 11 & $2.88295$ & 64 / 32 & $2.894427$ & $2.918992$ & 0 / 0\\
-12 & $2.93277$ & 128 / 32 & $\mathbf{2.931515}$ & $2.992573$ & --- \\
-13 & $2.956$ & \todo{} & & & \\
-14 & $2.98995$ & \todo{} & & & \\\bottomrule
+12 & $2.93277$ & 192 / 32 & $\mathbf{2.931515}$ & $2.992573$ & --- \\
+13 & $2.956$ & 48 / --- & $2.997184$ & --- & 0 / --- \\
+14 & $2.98995$ & 42 / --- & $3.000000$ & --- & 0 / --- \\\bottomrule
 \end{tabular}
 \caption{First 3D screen (annealed ball$\to$cube vs.\ rigid control, $53{,}000$ steps per start; best after exact tightening). The best $n=10$ run is within $2\cdot10^{-7}$ of $1+5\sqrt2/4$; the tightened best $n=11$ run equals $2+2/\sqrt5\approx2.894427$ to $10^{-9}$, below the March 2026 value but above Lin's $2.8829529$.}\label{tab:cubes}
 \end{table}
@@ -109,13 +109,13 @@ Exact tightening matters: raw runs stop about $10^{-4}$ above the record because
 \paragraph{Scaling.} Hit rates fall with $n$ at a fixed budget. At $n=26$ they rise with hardening time; at $n=27$--$29$ they do not.
 
 \section{Discussion}
-The method's value is the basin it lands in: starting from balls, configurations are dense before orientation matters, and rotation is decided only as corners appear. For 3D, where the catalogue is sparse, this was enough to improve $n=12$ within 128 starts. \todo{Update with n=11, 13, 14 and larger 3D screens.}
+The method's value is the basin it lands in: starting from balls, configurations are dense before orientation matters, and rotation is decided only as corners appear. For 3D, where the catalogue is sparse, this was enough to improve $n=12$: 2 of 192 starts land below the record. At $n=13$ and $14$ (48 and 42 starts, no rigid control) no run came within $0.04$ and $0.01$ of the catalogue; the best $n=14$ run is the trivial side $3$.
 
 \paragraph{Limitations.} (i) No optimality claims. (ii) The catalogue values for cubes were read from Friedman's page images, and Lin's packings are not described in text; $2.93277$ is truncated (``$2.93277+$''), which does not affect a $0.00126$ margin. (iii) Hit rates are from modest sample sizes and are reported with counts.
 
 \paragraph{Reproducibility.} All code, seeds, run logs and certificates are at \url{https://github.com/yoheinakajima/soft-to-rigid-packing}. \texttt{scripts/reproduce\_n12.sh} regenerates the $n=12$ packing and its certificate in a few minutes on a laptop.
 
-\paragraph{Acknowledgements.} Code, experiments and verification were developed with Claude (Anthropic), an AI system, under the author's direction. The author takes responsibility for the content. \todo{thank E.~Friedman, the Squares Project.}
+\paragraph{Acknowledgements.} Code, experiments and verification were developed with Claude (Anthropic), an AI system, under the author's direction. The author takes responsibility for the content.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}

@@ -48,4 +48,6 @@ Chronological record of every experiment, including the ones that failed. Dates 
   - n = 11: best 2.894427 (= 2 + 2/√5) after tightening; rigid 2.918992.
   - **n = 12: seed 52 → 2.931821 raw → 2.931514578 tightened, below 2.93277.** Seed 83 → 2.931619541 (distinct arrangement, also below). Rigid best 2.992573.
 - Certificate: exact rational arithmetic, all 66 pairs strictly separated, container side 2.9315165 after 1e-6 expansion.
-- In progress: more n = 12 starts; n = 11, 13, 14 screens.
+- n = 12, seeds 129–192: no further run below the record (2 of 192 total).
+- n = 13: 48 starts, best 2.997184 (record 2.956). n = 14: 42 starts, best 3.000000 = trivial (record 2.98995). Rigid controls for 13/14 not run: the cloud machine restarted twice and killed the batches; stopped there.
+- Claim file built with 1e-6 clearance (s = 2.9315185094797); verify.py and certify_exact.py pass; repo and site published.
