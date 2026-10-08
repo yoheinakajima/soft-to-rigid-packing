@@ -1,0 +1,33 @@
+# Rebuilds the paper (PDF + HTML) and the site on every push to main, then deploys docs/ to GitHub Pages.
+name: site
+on:
+  push: { branches: [main] }
+  workflow_dispatch:
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install LaTeX, pandoc, Python deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends latexmk texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended pandoc
+          pip install numpy scipy
+      - name: Verify the claim (fails the build if the packing is invalid)
+        run: |
+          python3 verify.py claims/cubincub_n12/cubincub_n12.json
+          python3 certify_exact.py claims/cubincub_n12/cubincub_n12.json
+      - name: Build site
+        env: { SITE_REPO: "https://github.com/${{ github.repository }}" }
+        run: python3 site/build.py
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: docs }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.d.outputs.page_url }}" }
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4

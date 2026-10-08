@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Twelve Cubes, Side 2.93151</title>
+<meta name="description" content="A new packing of 12 unit cubes in a cube of side 2.9315185094797, found by hardening balls into cubes. Coordinates, verifier, paper and the full research log.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<main>
+
+<header>
+  <div class="eyebrow">soft-to-rigid-packing · cubes in cubes · n = 12</div>
+  <h1>Twelve unit cubes fit in a cube of side 2.93151</h1>
+  <p class="lede">Start with balls, squeeze them into a box, then harden them into cubes while the walls keep pushing. On 8 October 2026 this found a packing of 12 unit cubes 0.0012533 smaller than the July 2026 record. Everything needed to check it is below and in the repository.</p>
+  <div class="links">
+    <a href="https://raw.githubusercontent.com/OWNER/soft-to-rigid-packing/main/claims/cubincub_n12/cubincub_n12.json">Coordinates (JSON)</a>
+    <a href="#verify">Verify</a>
+    <a href="paper.html">Paper</a>
+    <a href="paper.pdf">PDF</a>
+    <a href="https://github.com/OWNER/soft-to-rigid-packing">Repository</a>
+  </div>
+  <div class="nums">
+    <div><b>2.9315185094797</b><span>side, s_full (Friedman display 2.93151+)</span></div>
+    <div><b>2.9327717687</b><span>previous record, H. Lin, July 2026</span></div>
+    <div><b>−0.0012533</b><span>improvement</span></div>
+    <div><b>1.0 × 10⁻⁶</b><span>min gap between any two cubes and to every wall</span></div>
+    <div><b>7,633</b><span>random starts run, squares and cubes</span></div>
+    <div><b>6</b><span>published square records rediscovered from random starts</span></div>
+  </div>
+</header>
+
+<section class="wide">
+  <h2>The two winners</h2>
+  <div class="viewers">
+    <figure class="viewer" id="v3" style="margin:0">
+      <div class="stage"><div class="hud"></div></div>
+      <div class="ctl"><button type="button">Pause</button><input type="range" min="0" max="1000" value="0" aria-label="Scrub the n = 12 cube run"></div>
+      <figcaption class="cap"><b>n = 12 cubes, new record.</b> Seed 52: balls compress, harden into cubes, settle; the last frame is the published claim file. Dashed: the previous record's box. Drag to rotate.</figcaption>
+    </figure>
+    <figure class="viewer" id="v2" style="margin:0">
+      <div class="stage"><canvas></canvas><div class="hud"></div></div>
+      <div class="ctl"><button type="button">Pause</button><input type="range" min="0" max="1000" value="0" aria-label="Scrub the n = 11 square run"></div>
+      <figcaption class="cap"><b>n = 11 squares, where it started.</b> The first run to reach Trump's 1979 packing (side 3.877084, proved optimal in 2026) from random disks. Dashed: Trump's box.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="verify">
+  <h2>Verify it</h2>
+  <p>The claim is a list of twelve poses. Pose <i>i</i> is a centre <i>c<sub>i</sub></i> and a scalar-first unit quaternion <i>q<sub>i</sub></i>; cube <i>i</i> is the unit cube centred at <i>c<sub>i</sub></i> rotated by <i>q<sub>i</sub></i>. The container is [0, <i>s</i>]³ with <i>s</i> = 2.9315185094797.</p>
+  <div class="math">
+    <div><b>Corners.</b> <math display="block"><msub><mi>v</mi><mrow><mi>i</mi><mo>,</mo><mi>g</mi></mrow></msub><mo>=</mo><msub><mi>c</mi><mi>i</mi></msub><mo>+</mo><mi>R</mi><mo>(</mo><msub><mi>q</mi><mi>i</mi></msub><mo>)</mo><mspace width="0.2em"/><mi>g</mi><mo>,</mo><mspace width="1em"/><mi>g</mi><mo>∈</mo><msup><mrow><mo>{</mo><mo>−</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>}</mo></mrow><mn>3</mn></msup></math></div>
+    <div><b>Inside the box.</b> every coordinate of every corner satisfies <math><mn>0</mn><mo>&lt;</mo><msub><mi>v</mi><mi>k</mi></msub><mo>&lt;</mo><mi>s</mi></math>. Minimum wall gap: <span class="mono">1.0000000000e-06</span>.</div>
+    <div><b>No overlaps.</b> Two convex boxes are disjoint iff some axis separates their projections. For cubes it suffices to test 15 axes: the 3 face normals of each cube and the 9 cross products of their edges. Pair gap = max over those axes of the gap between projection intervals. Minimum over all 66 pairs: <span class="mono">1.0000000006e-06</span>.</div>
+    <div><b>Exactly.</b> <code>certify_exact.py</code> converts every number in the file to a rational, uses the exactly orthogonal rotation <math><mi>H</mi><mo>(</mo><mi>q</mi><mo>)</mo><mo>/</mo><msup><mrow><mo>|</mo><mi>q</mi><mo>|</mo></mrow><mn>2</mn></msup></math>, and exhibits a strictly separating plane for every pair with no rounding: <span class="mono">CERTIFIED</span>.</div>
+  </div>
+  <p>Run the same checks in this page:</p>
+  <p><button class="runbtn" id="runverify" type="button">Check the claim file</button></p>
+  <div class="out" id="vout">Loads the JSON from this site and runs the 15-axis test on all 66 pairs.</div>
+  <p>Or from the repository:</p>
+<pre>git clone https://github.com/OWNER/soft-to-rigid-packing.git && cd soft-to-rigid-packing
+python3 verify.py claims/cubincub_n12/cubincub_n12.json        # standard library only, exits 1 on failure
+python3 certify_exact.py claims/cubincub_n12/cubincub_n12.json # exact rational arithmetic
+./scripts/reproduce_n12.sh                                      # rerun the search from seed 52</pre>
+  <p class="cap">Same file format and checks as the current record file, <a href="https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/packing_records/records/cubincub_n12.json">Hyra-results/cubincub_n12.json</a>, so the two can be compared line by line.</p>
+</section>
+
+<section>
+  <h2>What we found</h2>
+  <ul class="found">
+    <li><b>n = 12 cubes: a new record.</b> 2 of 192 ball → cube starts land below the previous record, in two different arrangements (2.931515 and 2.931620 before adding clearance). The rigid-start control's best of 32 is 2.99257.</li>
+    <li><b>The method is reliable on squares.</b> From random starts it reaches Trump (n = 11), Bidwell (17), Hämäläinen (18), Wainwright (19), Friedman (26) and Göbel (27) to 10⁻¹², and beats a rigid control run on the same seeds.</li>
+    <li><b>Starting soft is what matters.</b> Rigid cubes or squares started from the same positions jam. Starting from balls, the cubes are already densely packed before orientation matters.</li>
+    <li><b>Where it fails.</b> No square record was improved. Squares n = 28 and 29 stay 0.02 and 0.005 above the record; cubes n = 10 and 11 settle in known but worse packings. An octagon-shaped intermediate, meant to give rotation a signal earlier, did not help.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>How we got here</h2>
+  <ol class="timeline">
+    <li><div class="when">7 Oct · squares, n = 11</div><h3>Can blobs that harden find the best packing?</h3><p>Yes: 6 of 160 starts reach Trump's packing; 0 of 120 rigid starts do.</p></li>
+    <li><div class="when">7 Oct · squares, n = 2–30</div><h3>Same settings, every n</h3><p>Tilted records found up to n = 11, none beyond. Rigid starts win when a grid has empty cells; blobs win when it is full.</p></li>
+    <li><div class="when">7 Oct · squares, n = 17 and 19</div><h3>Five setups on the same seeds</h3><p>Blobs reach Bidwell's n = 17 packing 10 times in 960 starts; rigid and octagon starts never do.</p></li>
+    <li><div class="when">7 Oct · exact tightening</div><h3>From penalty slack to exact contact</h3><p>A constrained solver (corners in the box, a separating plane per pair) snaps near-misses onto the records to 10⁻¹².</p></li>
+    <li><div class="when">8 Oct · squares, n = 26–29</div><h3>More hardening time</h3><p>At n = 26 the hit rate climbs from 2.5% to 10.4% as steps grow; n = 28 and 29 stay out of reach.</p></li>
+    <li class="key"><div class="when">8 Oct · cubes, n = 9–12</div><h3>Same method, one dimension up</h3><p>Friedman's n = 9 packing is found 16 times in 64. At n = 12, seed 52 lands below the July 2026 record.</p></li>
+    <li class="key"><div class="when">8 Oct · claim</div><h3>Certified and published</h3><p>Clearance of 10⁻⁶ added, exact certificate passed, file in the record's format. Submitted to Erich Friedman's catalogue: pending.</p></li>
+  </ol>
+  <p class="cap">Every experiment, including dead ends, is in <a href="https://github.com/OWNER/soft-to-rigid-packing/blob/main/EXPERIMENT_LOG.md">EXPERIMENT_LOG.md</a>.</p>
+</section>
+
+<section class="paper">
+  <h2>Paper</h2>
+  <p><i>Twelve Unit Cubes in a Cube of Side 2.9315, Found by Hardening Balls into Cubes</i>. Read it <a href="paper.html">online</a>, with the interactive 3D figure, or as a <a href="paper.pdf">PDF</a>. Both are rebuilt from <code>paper/main.tex</code> on every commit, so these links always point to the latest draft.</p>
+  <div class="stamp">built from commit uncommitted · 2026-10-08 16:31 UTC</div>
+</section>
+
+<footer>
+  Yohei Nakajima. Code, experiments and verification were developed with Claude (Anthropic). MIT licence. <a href="https://github.com/OWNER/soft-to-rigid-packing">Repository</a>.
+</footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="assets/viewers.js"></script>
+<script>
+(async function () {
+  const get = u => fetch(u).then(r => r.json());
+  try { SiteViewers.cube(document.getElementById('v3'), await get('data/replay_cubes_n12.json')); } catch (e) { document.querySelector('#v3 .hud').textContent = 'Could not load the replay.'; }
+  try { SiteViewers.square(document.getElementById('v2'), await get('data/replay_squares_n11.json')); } catch (e) { document.querySelector('#v2 .hud').textContent = 'Could not load the replay.'; }
+  document.getElementById('runverify').onclick = async () => {
+    const out = document.getElementById('vout'); out.textContent = 'Checking…';
+    try {
+      const t0 = performance.now(), r = SiteViewers.verify(await get('data/cubincub_n12.json'));
+      out.innerHTML = `n = ${r.n}   s = ${r.s.toFixed(13)}\nmin wall gap = ${r.wall.toExponential(9)}\nmin pair gap = ${r.pair.toExponential(9)}\n<span class="${r.ok ? 'ok' : 'bad'}">${r.ok ? 'VALID' : 'INVALID'}</span> · ${(performance.now() - t0).toFixed(0)} ms`;
+    } catch (e) { out.textContent = 'Could not load the claim file: ' + e.message; }
+  };
+})();
+</script>
+</body>
+</html>

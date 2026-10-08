@@ -1,0 +1,12 @@
+paper/*.aux
+paper/*.log
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.out
+paper/*.blg
+paper/*.bbl
+paper/build.log
+paper/pg-*.png
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Twelve Unit Cubes in a Cube of Side 2.9315,<br />
+Found by Hardening Balls into Cubes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+main.paper-body { max-width: 720px; gap: 0 }
+main.paper-body h1 { font-size: clamp(28px, 4.6vw, 40px); margin-bottom: 10px }
+main.paper-body h2 { margin: 36px 0 10px } main.paper-body h3 { margin: 22px 0 8px }
+.byline { color: var(--muted); margin-bottom: 18px } .abstract { border-left: 2px solid var(--rule); padding-left: 16px; color: var(--muted); margin-bottom: 10px }
+figure { margin: 22px 0 } figure img { width: 100%; height: auto; display: block } figcaption { font-size: 14px; color: var(--muted) }
+table { margin: 16px 0; font-size: 13px; display: block; overflow-x: auto } td, th { white-space: nowrap }
+.todo, [style*="color: red"] { color: var(--tilt) !important }
+.topbar { max-width: 720px; margin: 0 auto 28px; display: flex; gap: 18px; flex-wrap: wrap; font: 600 14px var(--f-display) }
+.topbar a { text-decoration: none; border-bottom: 1.5px solid var(--ink) }
+.live { margin: 8px 0 24px }
+main.paper-body h4, main.paper-body h5 { font-family: var(--f-body); font-size: 17px; margin: 16px 0 4px }
+main.paper-body section { display: block }
+</style>
+</head>
+<body>
+<nav class="topbar"><a href="index.html">← Overview</a><a href="paper.pdf">PDF</a><span class="stamp">draft built from commit uncommitted · 2026-10-08 16:31 UTC</span></nav>
+<main class="paper-body">
+<h1>Twelve Unit Cubes in a Cube of Side 2.9315,<br />
+Found by Hardening Balls into Cubes</h1>
+<div class="byline">Yohei Nakajima<a href="#fn1" class="footnote-ref"
+id="fnref1" role="doc-noteref"><sup>1</sup></a></div>
+<div class="abstract"><p>We give a packing of 12 unit cubes in a cube of
+side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.9315185</mn><annotation encoding="application/x-tex">2.9315185</annotation></semantics></math>,
+with every pair and every wall at least
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math>
+apart, improving the previous best known side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.9327717687</mn><annotation encoding="application/x-tex">2.9327717687</annotation></semantics></math>
+(H. Lin, July 2026 <span class="citation" data-cites="hyra">(Tencent
+Hunyuan, n.d.)</span>). The packing was found by a soft-to-rigid
+homotopy: unit-diameter balls are compressed in a shrinking box and then
+deformed through rounded cubes into rigid unit cubes while inward
+pressure on the box continues. The final configuration is tightened with
+a constrained solver that keeps every corner inside the box and a
+separating plane between every nearby pair, and validated by an exact
+rational certificate. On unit squares in a square, the same method
+recovers the best known packings for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>
+(now proved optimal),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>17</mn><annotation encoding="application/x-tex">17</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>18</mn><annotation encoding="application/x-tex">18</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>19</mn><annotation encoding="application/x-tex">19</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>26</mn><annotation encoding="application/x-tex">26</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>27</mn><annotation encoding="application/x-tex">27</annotation></semantics></math>,
+and outperforms a rigid-start control on the same seeds. We report where
+the method fails
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>28</mn><mo>,</mo><mn>29</mn></mrow><annotation encoding="application/x-tex">n=28,29</annotation></semantics></math>
+squares;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>10</mn><mo>,</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=10,11</annotation></semantics></math>
+cubes so far), an ablation showing that an oriented intermediate shape
+does not help, and code to reproduce every result.</p></div>
+<h2 id="introduction">Introduction</h2>
+<p>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mi>d</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s_d(n)</annotation></semantics></math>
+be the side of the smallest
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>-dimensional
+cube that contains
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+non-overlapping unit cubes, free to rotate. For squares
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">d=2</annotation></semantics></math>)
+the problem has a long record history <span class="citation"
+data-cites="erdosgraham stromquist friedmansurvey squaresproject">(Erdős
+and Graham 1975; Stromquist 2003; Friedman, n.d.b; The Squares Project,
+n.d.)</span>; the smallest unsettled case,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>,
+was recently closed <span class="citation"
+data-cites="squaresproject">(The Squares Project, n.d.)</span>. For
+cubes
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">d=3</annotation></semantics></math>)
+far fewer results exist. Friedman’s catalogue <span class="citation"
+data-cites="friedmancubes">(Friedman, n.d.a)</span> lists non-trivial
+packings for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>9</mn></mrow><annotation encoding="application/x-tex">n=9</annotation></semantics></math>–<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>14</mn><annotation encoding="application/x-tex">14</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>28</mn><annotation encoding="application/x-tex">28</annotation></semantics></math>–<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>33</mn><annotation encoding="application/x-tex">33</annotation></semantics></math>;
+the entries for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>12</mn><annotation encoding="application/x-tex">12</annotation></semantics></math>
+were improved in 2026 (T. Berthold et al. in March for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>;
+H. Lin in July for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>12</mn><annotation encoding="application/x-tex">12</annotation></semantics></math>,
+with coordinates published in <span class="citation"
+data-cites="hyra">(Tencent Hunyuan, n.d.)</span>), and for every other
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>&lt;</mo><mn>34</mn></mrow><annotation encoding="application/x-tex">n&lt;34</annotation></semantics></math>
+the trivial packing is the best known.</p>
+<h5 id="contribution.">Contribution.</h5>
+<ol>
+<li><p>A packing of 12 unit cubes in a cube of side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.9315185094797</mn><annotation encoding="application/x-tex">2.9315185094797</annotation></semantics></math>
+with every pair and every wall separated by at least
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math>
+(§<a href="#sec:record" data-reference-type="ref"
+data-reference="sec:record">3</a>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.0012533</mn><annotation encoding="application/x-tex">0.0012533</annotation></semantics></math>
+below the previous record
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.9327717687048653</mn><annotation encoding="application/x-tex">2.9327717687048653</annotation></semantics></math>.
+It is certified in exact rational arithmetic.</p></li>
+<li><p>A simple search method, soft-to-rigid homotopy with inward
+pressure (§<a href="#sec:method" data-reference-type="ref"
+data-reference="sec:method">2</a>), and an exact tightening step that
+turns its output into a locally optimal packing to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math>.</p></li>
+<li><p>An empirical record of what the method does and does not reach:
+in 2D it recovers six published records from random starts and beats a
+rigid-start control; it fails on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>28</mn><mo>,</mo><mn>29</mn></mrow><annotation encoding="application/x-tex">n=28,29</annotation></semantics></math>
+squares; an oriented intermediate shape does not raise its hit rate (§<a
+href="#sec:squares" data-reference-type="ref"
+data-reference="sec:squares">4</a>, §<a href="#sec:ablations"
+data-reference-type="ref"
+data-reference="sec:ablations">5</a>).</p></li>
+</ol>
+<p>This is a search result, not an optimality proof.</p>
+<h5 id="related-methods.">Related methods.</h5>
+<p>Gensane and Ryckelynck’s perturbation–compression algorithm found
+dense square packings, including
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>,
+from random starts <span class="citation" data-cites="gensane">(Gensane
+and Ryckelynck 2005)</span>. Recent square records
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>28</mn></mrow><annotation encoding="application/x-tex">n=28</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>29</mn><annotation encoding="application/x-tex">29</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>39</mn><annotation encoding="application/x-tex">39</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>41</mn><annotation encoding="application/x-tex">41</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>50</mn><annotation encoding="application/x-tex">50</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>51</mn><annotation encoding="application/x-tex">51</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>55</mn><annotation encoding="application/x-tex">55</annotation></semantics></math>)
+come from rigid simulated annealing and exact refinement <span
+class="citation" data-cites="squaresproject">(The Squares Project,
+n.d.)</span>. Our method differs in starting from balls and changing the
+shapes, not just their positions, during the search.</p>
+<h2 id="sec:method">Method</h2>
+<h5 id="shape-family.">Shape family.</h5>
+<p>A <em>rounded cube</em> of softness
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>∈</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mfrac displaystyle="false"><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">r\in[0,\tfrac12]</annotation></semantics></math>
+is a cube of half-side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac displaystyle="false"><mn>1</mn><mn>2</mn></mfrac><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">\tfrac12-r</annotation></semantics></math>
+dilated by a ball of radius
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+(the Minkowski sum). At
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mfrac displaystyle="false"><mn>1</mn><mn>2</mn></mfrac></mrow><annotation encoding="application/x-tex">r=\tfrac12</annotation></semantics></math>
+it is a unit-diameter ball, at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">r=0</annotation></semantics></math>
+a unit cube, and every member lies inside the unit cube with the same
+centre and orientation. Hardening
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>↓</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">r\downarrow 0</annotation></semantics></math>)
+therefore only grows the shapes, and the container must expand to
+accommodate them. The square version uses rounded squares.</p>
+<h5 id="energy-and-pressure.">Energy and pressure.</h5>
+<p>For centres
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mi>i</mi></msub><annotation encoding="application/x-tex">c_i</annotation></semantics></math>,
+orientations
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mi>i</mi></msub><annotation encoding="application/x-tex">q_i</annotation></semantics></math>
+(quaternions in 3D, angles in 2D) and container side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>,
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo>=</mo><munder><mo>∑</mo><mrow><mi>i</mi><mo>&lt;</mo><mi>j</mi></mrow></munder><mo minsize="1.2" maxsize="1.2" stretchy="false" form="prefix">(</mo><mn>2</mn><mi>r</mi><mo>−</mo><mo>sd</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow><msubsup><mo minsize="1.2" maxsize="1.2" stretchy="false" form="postfix">)</mo><mo>+</mo><mn>2</mn></msubsup><mo>+</mo><munder><mo>∑</mo><mi>i</mi></munder><munder><mo>∑</mo><mtext mathvariant="normal">walls</mtext></munder><msubsup><mrow><mo stretchy="true" form="prefix">(</mo><mtext mathvariant="normal">violation</mtext><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mn>2</mn></msubsup><mo>+</mo><mi>μ</mi><mi>L</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">E=\sum_{i&lt;j}\big(2r-\operatorname{sd}(i,j)\big)_+^2+\sum_i\sum_{\text{walls}}(\text{violation})_+^2+\mu L,</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>sd</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>i</mi><mo>,</mo><mi>j</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\operatorname{sd}(i,j)</annotation></semantics></math>
+is the signed distance between the cores (cube of half-side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac displaystyle="false"><mn>1</mn><mn>2</mn></mfrac><mo>−</mo><mi>r</mi></mrow><annotation encoding="application/x-tex">\tfrac12-r</annotation></semantics></math>):
+exact Euclidean distance when separated (vertex–face and edge–edge
+features), and minus the separating-axis penetration depth when
+overlapping (15 axes for cubes <span class="citation"
+data-cites="gottschalk">(Gottschalk, Lin, and Manocha 1996)</span>). The
+term
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mi>L</mi></mrow><annotation encoding="application/x-tex">\mu L</annotation></semantics></math>
+is inward pressure; the box resizes symmetrically so all walls push.
+Positions, orientations and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>
+follow momentum gradient descent with analytic gradients (checked
+against finite differences on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>72</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">72{,}000</annotation></semantics></math>
+random cube-pair gradient components and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>120</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">120{,}000</annotation></semantics></math>
+square-pair components).</p>
+<h5 id="schedule.">Schedule.</h5>
+<p>Compress balls under pressure
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mi>μ</mi></mrow><annotation encoding="application/x-tex">3\mu</annotation></semantics></math>
+(5<span>,</span>000 steps); morph
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>:</mo><mfrac displaystyle="false"><mn>1</mn><mn>2</mn></mfrac><mo>→</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">r:\tfrac12\to0</annotation></semantics></math>
+linearly at pressure
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo>=</mo><mn>0.02</mn></mrow><annotation encoding="application/x-tex">\mu=0.02</annotation></semantics></math>
+(45<span>,</span>000 steps); settle rigid cubes while
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>μ</mi><annotation encoding="application/x-tex">\mu</annotation></semantics></math>
+decays to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">2\cdot10^{-6}</annotation></semantics></math>
+(3<span>,</span>000 steps). Optional <em>annealing</em> adds Gaussian
+kicks to positions and angles that decay to zero during compression and
+morphing. The <em>rigid control</em> runs the identical schedule with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">r=0</annotation></semantics></math>
+throughout.</p>
+<h5 id="legalization.">Legalization.</h5>
+<p>Penalty pressure tolerates small overlaps. Each run is legalized by
+scaling centres apart about their mean (bisection to the smallest factor
+at which no pair overlaps by more than
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math>
+under the separating-axis test) and measuring the tight bounding cube.
+All sides reported below are legal packings.</p>
+<h5 id="exact-tightening.">Exact tightening.</h5>
+<p>Runs within a threshold of the catalogue are passed to a constrained
+solver: minimize
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>
+over centres, rotations and per-pair separating planes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>u</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub><mo>⋅</mo><mi>p</mi><mo>=</mo><msub><mi>c</mi><mrow><mi>i</mi><mi>j</mi></mrow></msub></mrow><annotation encoding="application/x-tex">u_{ij}\cdot p=c_{ij}</annotation></semantics></math>,
+subject to every corner of every cube lying in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mi>L</mi><mo stretchy="true" form="postfix">]</mo></mrow><mn>3</mn></msup><annotation encoding="application/x-tex">[0,L]^3</annotation></semantics></math>
+and the corners of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+lying on opposite sides of their plane. We use SLSQP <span
+class="citation" data-cites="kraft">(Kraft 1988)</span> in outer
+iterations with a trust region, rebuilding the pair list and re-basing
+rotations each iteration, and accept a step only if the independently
+legalized side decreases. From near-miss runs the solver converges to
+Trump’s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>11</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s_2(11)</annotation></semantics></math>
+<span class="citation" data-cites="trump">(Trump 1979)</span> and
+Bidwell’s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mn>2</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>17</mn><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">s_2(17)</annotation></semantics></math>
+<span class="citation" data-cites="friedmansurvey">(Friedman,
+n.d.b)</span> to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math>,
+and from a perturbed copy to Friedman’s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mn>3</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>9</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>2</mn><mo>+</mo><mn>1</mn><mi>/</mi><msqrt><mn>2</mn></msqrt></mrow><annotation encoding="application/x-tex">s_3(9)=2+1/\sqrt2</annotation></semantics></math>.</p>
+<h5 id="exact-certificate.">Exact certificate.</h5>
+<p>For a reported 3D packing we expand centres by a factor
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>+</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">1+10^{-6}</annotation></semantics></math>
+about their mean and inflate each half-side to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac displaystyle="false"><mn>1</mn><mn>2</mn></mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\tfrac12(1+10^{-12})</annotation></semantics></math>,
+which covers floating-point non-orthogonality of the axes. We convert
+every coordinate to an exact rational, compute all corners exactly, and
+check (i) every corner lies in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mi>S</mi><mo stretchy="true" form="postfix">]</mo></mrow><mn>3</mn></msup><annotation encoding="application/x-tex">[0,S]^3</annotation></semantics></math>
+for a rational
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+and (ii) every pair is strictly separated by an explicit rational plane.
+A linear program proposes each plane; the check itself uses only exact
+arithmetic.</p>
+<h2 id="sec:record">Twelve cubes</h2>
+<div class="theorem">
+<p><strong>Theorem 1</strong>. <em>Twelve unit cubes fit in a cube of
+side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.9315185094797</mn><annotation encoding="application/x-tex">2.9315185094797</annotation></semantics></math>
+with pairwise and wall clearance at least
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math>.
+Hence
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>s</mi><mn>3</mn></msub><mrow><mo stretchy="true" form="prefix">(</mo><mn>12</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>≤</mo><mn>2.9315185094797</mn><mo>&lt;</mo><mn>2.9327717687048653</mn></mrow><annotation encoding="application/x-tex">s_3(12)\le 2.9315185094797&lt;2.9327717687048653</annotation></semantics></math>.</em></p>
+</div>
+<p><em>Certificate.</em> The claim file
+(<code>claims/cubincub_n12/cubincub_n12.json</code>, Table <a
+href="#tab:coords" data-reference-type="ref"
+data-reference="tab:coords">3</a>) lists one pose
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">[</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo>,</mo><msub><mi>q</mi><mi>w</mi></msub><mo>,</mo><msub><mi>q</mi><mi>x</mi></msub><mo>,</mo><msub><mi>q</mi><mi>y</mi></msub><mo>,</mo><msub><mi>q</mi><mi>z</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[x,y,z,q_w,q_x,q_y,q_z]</annotation></semantics></math>
+per cube, the format of the previous record file <span class="citation"
+data-cites="hyra">(Tencent Hunyuan, n.d.)</span>. It was obtained from
+the tightened packing (side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.931514577965</mn><annotation encoding="application/x-tex">2.931514577965</annotation></semantics></math>,
+with touching contacts) by spreading centres by a factor
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>+</mo><mn>1.0</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">1+1.0\cdot10^{-6}</annotation></semantics></math>
+until every pair is separated by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math>,
+adding a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup><annotation encoding="application/x-tex">10^{-6}</annotation></semantics></math>
+wall gap and rounding the side up. Two checks pass. (i) A floating-point
+15-axis separating-axis test (<code>verify.py</code>, 30 lines): minimum
+wall gap
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.000000000</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">1.000000000\cdot10^{-6}</annotation></semantics></math>,
+minimum pair gap
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1.000000001</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">1.000000001\cdot10^{-6}</annotation></semantics></math>.
+(ii) An exact check (<code>certify_exact.py</code>): every number is
+converted to a rational, rotations are the exactly orthogonal
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><msup><mrow><mo stretchy="true" form="prefix">|</mo><mi>q</mi><mo stretchy="true" form="postfix">|</mo></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">H(q)/|q|^2</annotation></semantics></math>,
+every corner lies in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mi>s</mi><mo stretchy="true" form="postfix">]</mo></mrow><mn>3</mn></msup><annotation encoding="application/x-tex">[0,s]^3</annotation></semantics></math>
+and every pair is strictly separated by an explicit rational plane.</p>
+<p>Four cubes are exactly axis-aligned, two are tilted by less than
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>1</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">1^\circ</annotation></semantics></math>,
+and six are tilted by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>9</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">9^\circ</annotation></semantics></math>
+or more (Figure <a href="#fig:n12" data-reference-type="ref"
+data-reference="fig:n12">1</a>). Several quaternions have repeated
+components (e.g. cube 1:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mn>0.58389</mn><mo>,</mo><mo>−</mo><mn>0.58389</mn><mo>,</mo><mo>−</mo><mn>0.39884</mn><mo>,</mo><mo>−</mo><mn>0.39884</mn><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0.58389,-0.58389,-0.39884,-0.39884)</annotation></semantics></math>),
+suggesting a closed form that we have not derived. <strong>TODO: attempt
+exact algebraic value from the active contact graph.</strong></p>
+<h5 id="how-it-was-found.">How it was found.</h5>
+<p>Seed 52 of the first 64
+ball<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\to</annotation></semantics></math>cube
+starts with annealing ended at legalized side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.931821</mn><annotation encoding="application/x-tex">2.931821</annotation></semantics></math>;
+exact tightening lowered it to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.931514577965</mn><annotation encoding="application/x-tex">2.931514577965</annotation></semantics></math>.
+A second start (seed 83) ended at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.931910</mn><annotation encoding="application/x-tex">2.931910</annotation></semantics></math>
+and tightens to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.931619541</mn><annotation encoding="application/x-tex">2.931619541</annotation></semantics></math>:
+a distinct local optimum, also below the catalogue. Two of the first 128
+starts land below
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.93277</mn><annotation encoding="application/x-tex">2.93277</annotation></semantics></math>.
+The rigid control’s best of 32 starts is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.99257</mn><annotation encoding="application/x-tex">2.99257</annotation></semantics></math>.</p>
+<figure id="fig:n12">
+<img src="figures/n12_views.png" />
+<figcaption>Twelve unit cubes in a cube of side
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.931515</mn><annotation encoding="application/x-tex">2.931515</annotation></semantics></math>.
+Blue: tilt below
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>1.5</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">1.5^\circ</annotation></semantics></math>;
+red: tilted.</figcaption>
+</figure><div class="viewer live" id="live3"><div class="stage"><div class="hud"></div></div><div class="ctl"><button type="button">Pause</button><input type="range" min="0" max="1000" value="0" aria-label="Scrub the run"></div><div class="cap">Interactive: the run that found this packing, from balls to the certified cubes. Drag to rotate.</div></div>
+<h5 id="other-cube-counts.">Other cube counts.</h5>
+<p>Table <a href="#tab:cubes" data-reference-type="ref"
+data-reference="tab:cubes">1</a> summarizes the first 3D screen. The
+method matches Friedman’s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>9</mn></mrow><annotation encoding="application/x-tex">n=9</annotation></semantics></math>
+packing often, settles in worse arrangements at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">n=10</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>11</mn><annotation encoding="application/x-tex">11</annotation></semantics></math>,
+and is the only setup that comes near the catalogue at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n=12</annotation></semantics></math>.</p>
+<div id="tab:cubes">
+<table>
+<caption>First 3D screen (annealed
+ball<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\to</annotation></semantics></math>cube
+vs. rigid control,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>53</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">53{,}000</annotation></semantics></math>
+steps per start; best after exact tightening). The best
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>10</mn></mrow><annotation encoding="application/x-tex">n=10</annotation></semantics></math>
+run is within
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>7</mn></mrow></msup></mrow><annotation encoding="application/x-tex">2\cdot10^{-7}</annotation></semantics></math>
+of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>+</mo><mn>5</mn><msqrt><mn>2</mn></msqrt><mi>/</mi><mn>4</mn></mrow><annotation encoding="application/x-tex">1+5\sqrt2/4</annotation></semantics></math>;
+the tightened best
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>
+run equals
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>+</mo><mn>2</mn><mi>/</mi><msqrt><mn>5</mn></msqrt><mo>≈</mo><mn>2.894427</mn></mrow><annotation encoding="application/x-tex">2+2/\sqrt5\approx2.894427</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>9</mn></mrow></msup><annotation encoding="application/x-tex">10^{-9}</annotation></semantics></math>,
+below the March 2026 value but above Lin’s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.8829529</mn><annotation encoding="application/x-tex">2.8829529</annotation></semantics></math>.</caption>
+<thead>
+<tr class="header">
+<th
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math></th>
+<th style="text-align: right;">catalogue</th>
+<th style="text-align: right;">starts (ball / rigid)</th>
+<th style="text-align: right;">best
+ball<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\to</annotation></semantics></math>cube</th>
+<th style="text-align: right;">best rigid</th>
+<th style="text-align: right;">matches (ball / rigid)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">9</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.70711</mn><annotation encoding="application/x-tex">2.70711</annotation></semantics></math></td>
+<td style="text-align: right;">64 / 32</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.707107</mn><annotation encoding="application/x-tex">2.707107</annotation></semantics></math></td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.707107</mn><annotation encoding="application/x-tex">2.707107</annotation></semantics></math></td>
+<td style="text-align: right;">16 / 5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">10</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.70711</mn><annotation encoding="application/x-tex">2.70711</annotation></semantics></math></td>
+<td style="text-align: right;">64 / 32</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.767767</mn><annotation encoding="application/x-tex">2.767767</annotation></semantics></math></td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.894428</mn><annotation encoding="application/x-tex">2.894428</annotation></semantics></math></td>
+<td style="text-align: right;">0 / 0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">11</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.88295</mn><annotation encoding="application/x-tex">2.88295</annotation></semantics></math></td>
+<td style="text-align: right;">64 / 32</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.894427</mn><annotation encoding="application/x-tex">2.894427</annotation></semantics></math></td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.918992</mn><annotation encoding="application/x-tex">2.918992</annotation></semantics></math></td>
+<td style="text-align: right;">0 / 0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">12</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.93277</mn><annotation encoding="application/x-tex">2.93277</annotation></semantics></math></td>
+<td style="text-align: right;">128 / 32</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn mathvariant="bold">2.931515</mn><annotation encoding="application/x-tex">\mathbf{2.931515}</annotation></semantics></math></td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.992573</mn><annotation encoding="application/x-tex">2.992573</annotation></semantics></math></td>
+<td style="text-align: right;">—</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">13</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.956</mn><annotation encoding="application/x-tex">2.956</annotation></semantics></math></td>
+<td style="text-align: right;"><strong>TODO:</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">14</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.98995</mn><annotation encoding="application/x-tex">2.98995</annotation></semantics></math></td>
+<td style="text-align: right;"><strong>TODO:</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="sec:squares">Validation on squares</h2>
+<p>We developed the method on unit squares, where records are dense and
+recently audited <span class="citation"
+data-cites="squaresproject friedmansurvey">(The Squares Project, n.d.;
+Friedman, n.d.b)</span>.</p>
+<h5
+id="n11."><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>.</h5>
+<p>With annealing and the long schedule, 6 of 160 random starts reach
+Trump’s packing (tilt
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>40.18</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">40.18^\circ</annotation></semantics></math>);
+0 of 120 rigid-control starts do (best
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3.8877</mn><annotation encoding="application/x-tex">3.8877</annotation></semantics></math>,
+median
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4.000</mn><annotation encoding="application/x-tex">4.000</annotation></semantics></math>).
+Trump’s packing has since been proved optimal <span class="citation"
+data-cites="squaresproject">(The Squares Project, n.d.)</span>, so this
+is a sanity check.</p>
+<h5
+id="n230-at-a-fixed-schedule."><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">n=2</annotation></semantics></math>–<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>30</mn><annotation encoding="application/x-tex">30</annotation></semantics></math>
+at a fixed schedule.</h5>
+<p>Among cases whose best known packing has tilted squares, the method
+matches
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>5</mn><mo>,</mo><mn>10</mn><mo>,</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=5,10,11</annotation></semantics></math>
+and none from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>17</mn><annotation encoding="application/x-tex">17</annotation></semantics></math>
+upward at the standard step budget; the rigid control matches
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>.
+Grid cases split by slack: when the grid has empty cells
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>6</mn><mo>,</mo><mn>7</mn><mo>,</mo><mn>12</mn><mo>,</mo><mn>13</mn><mo>,</mo><mn>20</mn><mo>,</mo><mn>21</mn></mrow><annotation encoding="application/x-tex">n=6,7,12,13,20,21</annotation></semantics></math>)
+rigid starts fall into it more often (46–100% vs. 2–19%), while for full
+or nearly full grids
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>9</mn><mo>,</mo><mn>15</mn><mo>,</mo><mn>16</mn><mo>,</mo><mn>22</mn></mrow><annotation encoding="application/x-tex">n=9,15,16,22</annotation></semantics></math>–<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>25</mn><mo>,</mo><mn>30</mn></mrow><annotation encoding="application/x-tex">25,30</annotation></semantics></math>)
+rigid starts jam at tilts they cannot rotate out of
+(e.g. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>25</mn></mrow><annotation encoding="application/x-tex">n=25</annotation></semantics></math>:
+rigid 0/24, balls 7/48).</p>
+<h5 id="old-records-recovered-with-more-steps-and-exact-tightening.">Old
+records recovered with more steps and exact tightening.</h5>
+<div id="tab:squares">
+<table>
+<caption>Squares: best known packings reached from random starts. No run
+went below a catalogue value in about 5<span>,</span>000 starts at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>≥</mo><mn>17</mn></mrow><annotation encoding="application/x-tex">n\ge17</annotation></semantics></math>.</caption>
+<thead>
+<tr class="header">
+<th
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math></th>
+<th style="text-align: left;">best known (finder)</th>
+<th style="text-align: right;">recovered to</th>
+<th style="text-align: left;">hit rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">17</td>
+<td
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4.675530</mn><annotation encoding="application/x-tex">4.675530</annotation></semantics></math>
+(Bidwell 1998)</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math></td>
+<td style="text-align: left;">10/960 blob starts; 0/80 rigid</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">18</td>
+<td
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4.822876</mn><annotation encoding="application/x-tex">4.822876</annotation></semantics></math>
+(Hämäläinen 1980)</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup><annotation encoding="application/x-tex">10^{-5}</annotation></semantics></math></td>
+<td style="text-align: left;">2/24</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">19</td>
+<td
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4.885618</mn><annotation encoding="application/x-tex">4.885618</annotation></semantics></math>
+(Wainwright 1979)</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math></td>
+<td style="text-align: left;">2/960</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">26</td>
+<td
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5.621320</mn><annotation encoding="application/x-tex">5.621320</annotation></semantics></math>
+(Friedman 1997)</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math></td>
+<td style="text-align: left;">2.5% / 6.3% / 10.4% at
+3<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>×</mo><annotation encoding="application/x-tex">\times</annotation></semantics></math>/5<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>×</mo><annotation encoding="application/x-tex">\times</annotation></semantics></math>/10<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>×</mo><annotation encoding="application/x-tex">\times</annotation></semantics></math>
+steps</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">27</td>
+<td
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5.707107</mn><annotation encoding="application/x-tex">5.707107</annotation></semantics></math>
+(Göbel 1979)</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math></td>
+<td style="text-align: left;">1/416</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">28</td>
+<td
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5.824445</mn><annotation encoding="application/x-tex">5.824445</annotation></semantics></math>
+(Ellsworth 2025)</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: left;">best
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5.844498</mn><annotation encoding="application/x-tex">5.844498</annotation></semantics></math></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">29</td>
+<td
+style="text-align: left;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5.933833</mn><annotation encoding="application/x-tex">5.933833</annotation></semantics></math>
+(Schadt 2025)</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: left;">best
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5.938996</mn><annotation encoding="application/x-tex">5.938996</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Exact tightening matters: raw runs stop about
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mo>−</mo><mn>4</mn></mrow></msup><annotation encoding="application/x-tex">10^{-4}</annotation></semantics></math>
+above the record because of penalty slack, and the solver also pulls
+runs from up to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.022</mn><annotation encoding="application/x-tex">0.022</annotation></semantics></math>
+away into the record basin
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>27</mn></mrow><annotation encoding="application/x-tex">n=27</annotation></semantics></math>).
+After tightening, every arrangement within
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.001</mn><annotation encoding="application/x-tex">0.001</annotation></semantics></math>
+of the catalogue at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>17</mn></mrow><annotation encoding="application/x-tex">n=17</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>19</mn><annotation encoding="application/x-tex">19</annotation></semantics></math>
+was the catalogue packing itself.</p>
+<h2 id="sec:ablations">Ablations and negative results</h2>
+<h5 id="oriented-intermediate-shape.">Oriented intermediate shape.</h5>
+<p>Disks carry no orientation, and on the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>11</mn></mrow><annotation encoding="application/x-tex">n=11</annotation></semantics></math>
+hit the angles lock in only once
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>&lt;</mo><mn>0.06</mn></mrow><annotation encoding="application/x-tex">r&lt;0.06</annotation></semantics></math>.
+We tested morphing through regular octagons cut back to squares, which
+exert torque from the start. On the same seeds and steps
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>17</mn><mo>,</mo><mn>19</mn></mrow><annotation encoding="application/x-tex">n=17,19</annotation></semantics></math>,
+seeds 1–160), octagons hit 0/320 vs. 4/320 for annealed disks (one-sided
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>≈</mo><mn>0.06</mn></mrow><annotation encoding="application/x-tex">p\approx0.06</annotation></semantics></math>),
+with no better medians and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mo>×</mo></mrow><annotation encoding="application/x-tex">3\times</annotation></semantics></math>
+the cost. Late orientation commitment appears to help rather than
+hurt.</p>
+<h5 id="penalty-polish.">Penalty polish.</h5>
+<p>A fixed-box squeeze-and-shake stage changed sides by at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.009</mn><annotation encoding="application/x-tex">0.009</annotation></semantics></math>
+and never changed the arrangement; it is superseded by exact
+tightening.</p>
+<h5 id="scaling.">Scaling.</h5>
+<p>Hit rates fall with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+at a fixed budget. At
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>26</mn></mrow><annotation encoding="application/x-tex">n=26</annotation></semantics></math>
+they rise with hardening time; at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>27</mn></mrow><annotation encoding="application/x-tex">n=27</annotation></semantics></math>–<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>29</mn><annotation encoding="application/x-tex">29</annotation></semantics></math>
+they do not.</p>
+<h2 id="discussion">Discussion</h2>
+<p>The method’s value is the basin it lands in: starting from balls,
+configurations are dense before orientation matters, and rotation is
+decided only as corners appear. For 3D, where the catalogue is sparse,
+this was enough to improve
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n=12</annotation></semantics></math>
+within 128 starts. <strong>TODO: Update with n=11, 13, 14 and larger 3D
+screens.</strong></p>
+<h5 id="limitations.">Limitations.</h5>
+<p>(i) No optimality claims. (ii) The catalogue values for cubes were
+read from Friedman’s page images, and Lin’s packings are not described
+in text;
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.93277</mn><annotation encoding="application/x-tex">2.93277</annotation></semantics></math>
+is truncated
+(“<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.93277</mn><mo>+</mo></mrow><annotation encoding="application/x-tex">2.93277+</annotation></semantics></math>”),
+which does not affect a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.00126</mn><annotation encoding="application/x-tex">0.00126</annotation></semantics></math>
+margin. (iii) Hit rates are from modest sample sizes and are reported
+with counts.</p>
+<h5 id="reproducibility.">Reproducibility.</h5>
+<p>All code, seeds, run logs and certificates are at <strong>TODO:
+repository URL</strong>. <code>scripts/reproduce_n12.sh</code>
+regenerates the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n=12</annotation></semantics></math>
+packing and its certificate in a few minutes on a laptop.</p>
+<h5 id="acknowledgements.">Acknowledgements.</h5>
+<p>Code, experiments and verification were developed with Claude
+(Anthropic), an AI system, under the author’s direction. The author
+takes responsibility for the content. <strong>TODO: thank E. Friedman,
+the Squares Project.</strong></p>
+<h2 id="coordinates-for-n12">Coordinates for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n=12</annotation></semantics></math></h2>
+<p>Centres and unit quaternions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">(</mo><mi>w</mi><mo>,</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi><mo stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(w,x,y,z)</annotation></semantics></math>;
+cube
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+occupies
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>i</mi></msub><mo>+</mo><mi>R</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>q</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><msup><mrow><mo stretchy="true" form="prefix">[</mo><mo>−</mo><mfrac displaystyle="false"><mn>1</mn><mn>2</mn></mfrac><mo>,</mo><mfrac displaystyle="false"><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" form="postfix">]</mo></mrow><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">c_i+R(q_i)[-\tfrac12,\tfrac12]^3</annotation></semantics></math>
+in the box
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mrow><mo stretchy="true" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>2.9315185094797</mn><mo stretchy="true" form="postfix">]</mo></mrow><mn>3</mn></msup><annotation encoding="application/x-tex">[0,2.9315185094797]^3</annotation></semantics></math>.
+Full-precision values:
+<code>claims/cubincub_n12/cubincub_n12.json</code>.</p>
+<div class="center">
+<div id="tab:coords">
+<table>
+<caption>Coordinates of the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">n=12</annotation></semantics></math>
+packing.</caption>
+<thead>
+<tr class="header">
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>z</mi><annotation encoding="application/x-tex">z</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>w</mi><annotation encoding="application/x-tex">w</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mi>x</mi></msub><annotation encoding="application/x-tex">q_x</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mi>y</mi></msub><annotation encoding="application/x-tex">q_y</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>q</mi><mi>z</mi></msub><annotation encoding="application/x-tex">q_z</annotation></semantics></math></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1.5243900087</td>
+<td style="text-align: right;">2.4315173049</td>
+<td style="text-align: right;">1.3320181026</td>
+<td style="text-align: right;">0.5838886869</td>
+<td style="text-align: right;">-0.5838886869</td>
+<td style="text-align: right;">-0.3988408220</td>
+<td style="text-align: right;">-0.3988408220</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2.4315175095</td>
+<td style="text-align: right;">2.4315173049</td>
+<td style="text-align: right;">0.5000010000</td>
+<td style="text-align: right;">0.7071067812</td>
+<td style="text-align: right;">0.7071067812</td>
+<td style="text-align: right;">-0.0000000000</td>
+<td style="text-align: right;">0.0000000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.5000010000</td>
+<td style="text-align: right;">1.4369556928</td>
+<td style="text-align: right;">1.4377218077</td>
+<td style="text-align: right;">0.5395289954</td>
+<td style="text-align: right;">0.4570650535</td>
+<td style="text-align: right;">0.4570650535</td>
+<td style="text-align: right;">-0.5395289954</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.5098745912</td>
+<td style="text-align: right;">0.5769319953</td>
+<td style="text-align: right;">2.3545775829</td>
+<td style="text-align: right;">0.4560511351</td>
+<td style="text-align: right;">-0.5403863020</td>
+<td style="text-align: right;">-0.4560472394</td>
+<td style="text-align: right;">0.5403896022</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0.6086104699</td>
+<td style="text-align: right;">2.2929309153</td>
+<td style="text-align: right;">2.3887769910</td>
+<td style="text-align: right;">0.0258332833</td>
+<td style="text-align: right;">0.7609821302</td>
+<td style="text-align: right;">-0.6482073268</td>
+<td style="text-align: right;">-0.0081302199</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2.4315175095</td>
+<td style="text-align: right;">1.4315163049</td>
+<td style="text-align: right;">0.5000010000</td>
+<td style="text-align: right;">0.0000000000</td>
+<td style="text-align: right;">-0.0000000000</td>
+<td style="text-align: right;">-0.0000000000</td>
+<td style="text-align: right;">-1.0000000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">2.4298431049</td>
+<td style="text-align: right;">2.4215276465</td>
+<td style="text-align: right;">2.2620542416</td>
+<td style="text-align: right;">0.0000269579</td>
+<td style="text-align: right;">0.0016621483</td>
+<td style="text-align: right;">-0.9999712786</td>
+<td style="text-align: right;">0.0073944948</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1.5800409188</td>
+<td style="text-align: right;">1.4806927085</td>
+<td style="text-align: right;">2.4315175095</td>
+<td style="text-align: right;">0.0000000000</td>
+<td style="text-align: right;">-0.9765112947</td>
+<td style="text-align: right;">-0.2154662186</td>
+<td style="text-align: right;">-0.0000000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">1.6870691741</td>
+<td style="text-align: right;">0.7046058868</td>
+<td style="text-align: right;">1.3931640729</td>
+<td style="text-align: right;">0.1630483719</td>
+<td style="text-align: right;">-0.8266039691</td>
+<td style="text-align: right;">-0.3023204668</td>
+<td style="text-align: right;">0.4458065074</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">0.6714203714</td>
+<td style="text-align: right;">0.5125513149</td>
+<td style="text-align: right;">0.5042794969</td>
+<td style="text-align: right;">0.0019279356</td>
+<td style="text-align: right;">0.0017767559</td>
+<td style="text-align: right;">-0.7100527881</td>
+<td style="text-align: right;">-0.7041435680</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">2.4315175095</td>
+<td style="text-align: right;">0.5648571561</td>
+<td style="text-align: right;">2.4315175095</td>
+<td style="text-align: right;">0.5000000000</td>
+<td style="text-align: right;">-0.5000000000</td>
+<td style="text-align: right;">-0.5000000000</td>
+<td style="text-align: right;">0.5000000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">0.5000010000</td>
+<td style="text-align: right;">2.3777515563</td>
+<td style="text-align: right;">0.5000010000</td>
+<td style="text-align: right;">0.7071067812</td>
+<td style="text-align: right;">-0.7071067812</td>
+<td style="text-align: right;">0.0000000000</td>
+<td style="text-align: right;">0.0000000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="refs" class="references csl-bib-body hanging-indent"
+role="list">
+<div id="ref-erdosgraham" class="csl-entry" role="listitem">
+Erdős, Paul, and Ronald L. Graham. 1975. <span>“On Packing Squares with
+Equal Squares.”</span> <em>Journal of Combinatorial Theory, Series
+A</em> 19: 119–23.
+</div>
+<div id="ref-friedmancubes" class="csl-entry" role="listitem">
+Friedman, Erich. n.d.a. <span>“Cubes in Cubes.”</span> Erich’s Packing
+Center, <a href="https://erich-friedman.github.io/packing/cubincub/"
+class="uri">https://erich-friedman.github.io/packing/cubincub/</a>.
+</div>
+<div id="ref-friedmansurvey" class="csl-entry" role="listitem">
+———. n.d.b. <span>“Packing Unit Squares in Squares: A Survey and New
+Results.”</span> Electronic Journal of Combinatorics, Dynamic Survey
+DS7.
+</div>
+<div id="ref-gensane" class="csl-entry" role="listitem">
+Gensane, Thierry, and Philippe Ryckelynck. 2005. <span>“Improved Dense
+Packings of Congruent Squares in a Square.”</span> <em>Discrete &amp;
+Computational Geometry</em> 34: 97–109.
+</div>
+<div id="ref-gottschalk" class="csl-entry" role="listitem">
+Gottschalk, Stefan, Ming C. Lin, and Dinesh Manocha. 1996.
+<span>“<span>OBBTree</span>: A Hierarchical Structure for Rapid
+Interference Detection.”</span> In <em>Proceedings of SIGGRAPH ’96</em>,
+171–80.
+</div>
+<div id="ref-kraft" class="csl-entry" role="listitem">
+Kraft, Dieter. 1988. <span>“A Software Package for Sequential Quadratic
+Programming.”</span> DFVLR-FB 88-28. DFVLR.
+</div>
+<div id="ref-stromquist" class="csl-entry" role="listitem">
+Stromquist, Walter. 2003. <span>“Packing 10 or 11 Unit Squares in a
+Square.”</span> <em>Electronic Journal of Combinatorics</em> 10: R8.
+</div>
+<div id="ref-hyra" class="csl-entry" role="listitem">
+Tencent Hunyuan. n.d. <span>“Hyra-Results: Packing Records.”</span> <a
+href="https://github.com/Tencent-Hunyuan/Hyra-results/tree/main/AI4Science/packing_records"
+class="uri">https://github.com/Tencent-Hunyuan/Hyra-results/tree/main/AI4Science/packing_records</a>.
+</div>
+<div id="ref-squaresproject" class="csl-entry" role="listitem">
+The Squares Project. n.d. <span>“An Atlas of the Square Packing
+Problem.”</span> <a href="https://jlevy.github.io/squares/"
+class="uri">https://jlevy.github.io/squares/</a>.
+</div>
+<div id="ref-trump" class="csl-entry" role="listitem">
+Trump, Walter. 1979. <span>“Packing 11 Unit Squares in a Square.”</span>
+<a href="https://trump.de/square-packing/"
+class="uri">https://trump.de/square-packing/</a>.
+</div>
+</div>
+<aside id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p><strong>TODO: affiliation and contact</strong>.
+Experiments, code and verification were developed with the assistance of
+Claude (Anthropic); see the acknowledgements.<a href="#fnref1"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="assets/viewers.js"></script>
+<script>
+(async function () { const el = document.getElementById('live3'); if (!el) return;
+  try { SiteViewers.cube(el, await fetch('data/replay_cubes_n12.json').then(r => r.json())); } catch (e) { el.querySelector('.hud').textContent = 'Could not load the replay.'; } })();
+</script>
+</body>
+</html>

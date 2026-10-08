@@ -1,0 +1,4 @@
+s_full = 2.9315185094797
+exact min wall gap = 1.000000000039e-06
+min plane margin over 66 pairs (|u|_inf <= 1) = 1.000000000234e-06
+CERTIFIED

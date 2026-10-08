@@ -1,0 +1,2 @@
+exact container side S = 2.9315165094806286 (all corners in [0,S]^3 by construction)
+all 66 pairs strictly separated by explicit rational planes: True | smallest gap 9.999989985093486e-07

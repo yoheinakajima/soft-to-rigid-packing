@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>$title$</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+main.paper-body { max-width: 720px; gap: 0 }
+main.paper-body h1 { font-size: clamp(28px, 4.6vw, 40px); margin-bottom: 10px }
+main.paper-body h2 { margin: 36px 0 10px } main.paper-body h3 { margin: 22px 0 8px }
+.byline { color: var(--muted); margin-bottom: 18px } .abstract { border-left: 2px solid var(--rule); padding-left: 16px; color: var(--muted); margin-bottom: 10px }
+figure { margin: 22px 0 } figure img { width: 100%; height: auto; display: block } figcaption { font-size: 14px; color: var(--muted) }
+table { margin: 16px 0; font-size: 13px; display: block; overflow-x: auto } td, th { white-space: nowrap }
+.todo, [style*="color: red"] { color: var(--tilt) !important }
+.topbar { max-width: 720px; margin: 0 auto 28px; display: flex; gap: 18px; flex-wrap: wrap; font: 600 14px var(--f-display) }
+.topbar a { text-decoration: none; border-bottom: 1.5px solid var(--ink) }
+.live { margin: 8px 0 24px }
+main.paper-body h4, main.paper-body h5 { font-family: var(--f-body); font-size: 17px; margin: 16px 0 4px }
+main.paper-body section { display: block }
+</style>
+</head>
+<body>
+<nav class="topbar"><a href="index.html">← Overview</a><a href="paper.pdf">PDF</a><span class="stamp">draft built from commit {{COMMIT}} · {{BUILT}}</span></nav>
+<main class="paper-body">
+<h1>$title$</h1>
+<div class="byline">$for(author)$$author$$sep$, $endfor$</div>
+$if(abstract)$<div class="abstract">$abstract$</div>$endif$
+$body$
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="assets/viewers.js"></script>
+<script>
+(async function () { const el = document.getElementById('live3'); if (!el) return;
+  try { SiteViewers.cube(el, await fetch('data/replay_cubes_n12.json').then(r => r.json())); } catch (e) { el.querySelector('.hud').textContent = 'Could not load the replay.'; } })();
+</script>
+</body>
+</html>
