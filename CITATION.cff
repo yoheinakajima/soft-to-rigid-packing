@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this packing, code or data, please cite it as below."
+title: "Twelve unit cubes in a cube of side 2.9315: soft-to-rigid packing"
+authors:
+  - family-names: Nakajima
+    given-names: Yohei
+version: 1.0.0
+date-released: 2026-10-08
+license: MIT
+repository-code: "https://github.com/yoheinakajima/soft-to-rigid-packing"
+url: "https://yoheinakajima.github.io/soft-to-rigid-packing/"
+abstract: >-
+  A packing of 12 unit cubes in a cube of side 2.9315185094797, below the previous best known
+  2.9327717687048653 (H. Lin, July 2026), found by hardening balls into cubes under inward pressure
+  and certified in exact rational arithmetic. Includes the claim file, a 30-line verifier, an exact
+  certificate, simulators for squares and cubes, the paper and the full experiment log.
+keywords:
+  - packing
+  - cubes in a cube
+  - squares in a square
+  - computational geometry
+  - discrete geometry

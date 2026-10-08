@@ -1,0 +1,12 @@
+{
+  "title": "Twelve unit cubes in a cube of side 2.9315: soft-to-rigid packing",
+  "upload_type": "software",
+  "description": "<p>A packing of 12 unit cubes in a cube of side 2.9315185094797 (displayed 2.93151+), below the previous best known 2.9327717687048653 (H. Lin, July 2026). Every pair of cubes and every wall is at least 1e-6 apart. Found by a soft-to-rigid homotopy (balls compressed in a shrinking box and hardened into cubes under continued inward pressure), tightened by constrained optimization, and certified in exact rational arithmetic.</p><p>Contents: claim file in the format of the current record file (one [x, y, z, qw, qx, qy, qz] pose per cube), a 30-line verifier, an exact certificate, 2D and 3D simulators, the paper (LaTeX and PDF), and the full experiment log.</p><p>Code, experiments and verification were developed with Claude (Anthropic).</p>",
+  "creators": [{"name": "Nakajima, Yohei"}],
+  "license": "MIT",
+  "keywords": ["packing", "cubes in a cube", "squares in a square", "computational geometry", "discrete geometry"],
+  "related_identifiers": [
+    {"identifier": "https://yoheinakajima.github.io/soft-to-rigid-packing/", "relation": "isDocumentedBy", "resource_type": "publication-preprint"},
+    {"identifier": "https://erich-friedman.github.io/packing/cubincub/", "relation": "references"}
+  ]
+}
