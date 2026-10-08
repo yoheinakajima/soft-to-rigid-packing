@@ -4,8 +4,8 @@
 |---|---|---|
 | Friedman's catalogue | Record entry for n = 12 | Emailed 8 Oct 2026 |
 | Zenodo | DOI for release v1.0.0 (code, claim file, paper) | Minted: 10.5281/zenodo.23248095 (v1.0.0); concept DOI 10.5281/zenodo.23248094 |
-| arXiv | Full paper (`paper/main.tex`) | Package ready: `paper/arxiv/arxiv-source.tar.gz` |
-| Geombinatorics | Short note (`paper/geombinatorics/note.tex`) | Manuscript ready; needs signed copyright form |
+| arXiv | Full paper (`paper/main.tex`) | Package ready; on hold until Geombinatorics responds |
+| Geombinatorics | Short note (`paper/geombinatorics/note.tex`) | Gmail draft to go@uccs.edu ready; needs signed copyright form attached |
 | E-JC | Not now | See below |
 
 ## Decision: Geombinatorics, not E-JC
@@ -36,6 +36,6 @@
 
   > Dear Professor Soifer,
   >
-  > I would like to submit the attached note, "Twelve Unit Cubes in a Cube of Side 2.93152", for consideration in Geombinatorics. It gives a packing of 12 unit cubes in a cube of side 2.9315185, improving the July 2026 value 2.93277, with coordinates, a verification argument and an exact certificate. The coordinates and checking programs are public at https://github.com/yoheinakajima/soft-to-rigid-packing. A preprint is on arXiv [add ID] and archived on Zenodo (doi:10.5281/zenodo.23248095). The signed copyright form is attached.
+  > I would like to submit the attached note, "Twelve Unit Cubes in a Cube of Side 2.93152", for consideration in Geombinatorics. It gives a packing of 12 unit cubes in a cube of side 2.9315185, improving the July 2026 value 2.93277, with coordinates, a verification argument and an exact certificate. The coordinates and checking programs are public at https://github.com/yoheinakajima/soft-to-rigid-packing. The code and data are archived on Zenodo (doi:10.5281/zenodo.23248095). The signed copyright form is attached.
   >
   > Yohei Nakajima
