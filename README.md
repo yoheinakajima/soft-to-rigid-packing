@@ -2,6 +2,8 @@
 
 Packing unit squares in a square and unit cubes in a cube by **starting with balls and hardening them into cubes** while inward pressure shrinks the container.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23248094.svg)](https://doi.org/10.5281/zenodo.23248094)
+
 ## Headline result
 
 **12 unit cubes fit in a cube of side 2.9315185094797** (Friedman display 2.93151+), with every pair of cubes and every wall at least 10⁻⁶ apart. The previous record is 2.9327717687048653 (Haowei Lin, July 2026; [Hyra-results `cubincub_n12.json`](https://github.com/Tencent-Hunyuan/Hyra-results/blob/main/AI4Science/packing_records/records/cubincub_n12.json)). Improvement: 0.0012533.
@@ -53,6 +55,8 @@ Node ≥ 18 (simulators), Python ≥ 3.10 with NumPy and SciPy (exact tightening
 ## Credit
 
 Yohei Nakajima. Code, experiments and verification were developed with Claude (Anthropic) under the author's direction.
+
+Cite as: Y. Nakajima, *Twelve unit cubes in a cube of side 2.9315: soft-to-rigid packing*, v1.0.0, Zenodo, 2026. doi:[10.5281/zenodo.23248095](https://doi.org/10.5281/zenodo.23248095) (all versions: doi:[10.5281/zenodo.23248094](https://doi.org/10.5281/zenodo.23248094)).
 
 ## License
 

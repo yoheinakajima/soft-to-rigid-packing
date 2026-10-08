@@ -5,6 +5,14 @@ authors:
   - family-names: Nakajima
     given-names: Yohei
 version: 1.0.0
+doi: 10.5281/zenodo.23248094
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23248094
+    description: Concept DOI (all versions)
+  - type: doi
+    value: 10.5281/zenodo.23248095
+    description: Version 1.0.0
 date-released: 2026-10-08
 license: MIT
 repository-code: "https://github.com/yoheinakajima/soft-to-rigid-packing"
