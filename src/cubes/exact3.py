@@ -98,7 +98,26 @@ def tangent_basis(u):
     return e1, e2
 
 
-def solve(C, R, L, outer=40, trust=0.03, verbose=False):
+def left_jac(phi):
+    """Left Jacobian of SO(3): R(phi + d) ~= exp([J_l(phi) d]_x) R(phi)."""
+    th = np.linalg.norm(phi)
+    K = np.array([[0, -phi[2], phi[1]], [phi[2], 0, -phi[0]], [-phi[1], phi[0], 0]])
+    if th < 1e-6:
+        return np.eye(3) + 0.5 * K + K @ K / 6.0
+    return np.eye(3) + (1 - math.cos(th)) / th ** 2 * K + (th - math.sin(th)) / th ** 3 * K @ K
+
+
+def skew_batch(v):  # (...,3) -> (...,3,3)
+    S = np.zeros(v.shape + (3,))
+    S[..., 0, 1] = -v[..., 2]; S[..., 0, 2] = v[..., 1]
+    S[..., 1, 0] = v[..., 2]; S[..., 1, 2] = -v[..., 0]
+    S[..., 2, 0] = -v[..., 1]; S[..., 2, 1] = v[..., 0]
+    return S
+
+
+def solve(C, R, L, outer=40, trust=0.03, verbose=False, jac='analytic', return_funcs=False):
+    """jac='analytic' (closed-form constraint Jacobian) or 'fd' (SciPy finite differences, the previous behaviour).
+    return_funcs=True returns (cons, cons_jac, z0, bounds) of the first outer iteration, for testing."""
     C = np.array(C, float); R = [np.array(r) for r in R]; n = len(C)
     hist = []
     for it in range(outer):
@@ -120,21 +139,71 @@ def solve(C, R, L, outer=40, trust=0.03, verbose=False):
             Cz = z[:3 * n].reshape(n, 3); Ph = z[3 * n:6 * n].reshape(n, 3)
             return np.stack([Cz[i] + LG[i] @ rod(Ph[i]).T for i in range(n)])  # n x 8 x 3
 
+        def planes(z):
+            ab = z[iL + 1:iL + 1 + 2 * P].reshape(P, 2); c = z[iL + 1 + 2 * P:]
+            W = U0 + ab[:, :1] * E1 + ab[:, 1:] * E2
+            nw = np.linalg.norm(W, axis=1, keepdims=True)
+            return W / nw, nw, c
+
         def cons(z):
             V = verts(z); Lz = z[iL]
             g = [V.ravel(), (Lz - V).ravel()]
             if P:
-                ab = z[iL + 1:iL + 1 + 2 * P].reshape(P, 2); c = z[iL + 1 + 2 * P:]
-                U = U0 + ab[:, :1] * E1 + ab[:, 1:] * E2
-                U = U / np.linalg.norm(U, axis=1, keepdims=True)
+                U, _, c = planes(z)
                 sA = np.einsum('pkd,pd->pk', V[pi], U); sB = np.einsum('pkd,pd->pk', V[pj], U)
                 g += [(c[:, None] - sA).ravel(), (sB - c[:, None]).ravel()]
             return np.concatenate(g)
 
+        # constant index helpers for the analytic Jacobian
+        m0 = 24 * n
+        rows_v = np.arange(m0).reshape(n, 8, 3)
+        def cons_jac(z):
+            Ph = z[3 * n:6 * n].reshape(n, 3)
+            Rp = np.stack([rod(Ph[i]) for i in range(n)])
+            Jl = np.stack([left_jac(Ph[i]) for i in range(n)])
+            O = np.einsum('ikd,ied->ike', np.stack(LG), Rp)            # rotated offsets r_ik = R(phi_i) g_ik, n x 8 x 3
+            dVdphi = -np.einsum('ikab,ibc->ikac', skew_batch(O), Jl)     # n x 8 x 3(coord) x 3(phi)
+            V = z[:3 * n].reshape(n, 1, 3) + O
+            Jv = np.zeros((m0, nv))
+            for i in range(n):
+                r = rows_v[i]                                           # 8 x 3
+                for d in range(3):
+                    Jv[r[:, d], 3 * i + d] = 1.0
+                Jv[r.reshape(-1)[:, None], 3 * n + 3 * i + np.arange(3)[None, :]] = dVdphi[i].reshape(24, 3)
+            blocks = [Jv, -Jv]
+            Jb = -Jv.copy(); Jb[:, iL] = 1.0; blocks[1] = Jb
+            if P:
+                U, nw, c = planes(z)
+                Pm = (np.eye(3)[None] - U[:, :, None] * U[:, None, :]) / nw[:, :, None]   # P x 3 x 3
+                dU = np.stack([np.einsum('pab,pb->pa', Pm, E1), np.einsum('pab,pb->pa', Pm, E2)], axis=2)  # P x 3 x 2
+                for sgn, idx in ((-1.0, pi), (1.0, pj)):
+                    J = np.zeros((P, 8, nv))
+                    pr = np.arange(P)
+                    # wrt centre of the cube: sgn * U
+                    for d in range(3):
+                        J[pr, :, 3 * idx + d] = sgn * U[:, d:d + 1]
+                    # wrt phi of the cube: sgn * U^T dV/dphi
+                    dphi = np.einsum('pd,pkde->pke', U, dVdphi[idx])         # P x 8 x 3
+                    for e in range(3):
+                        J[pr, :, 3 * n + 3 * idx + e] = sgn * dphi[:, :, e]
+                    # wrt plane params a,b: sgn * V . dU
+                    dab = np.einsum('pkd,pdq->pkq', V[idx], dU)              # P x 8 x 2
+                    J[pr, :, iL + 1 + 2 * pr] = sgn * dab[:, :, 0]
+                    J[pr, :, iL + 2 + 2 * pr] = sgn * dab[:, :, 1]
+                    # wrt c: -sgn
+                    J[pr, :, iL + 1 + 2 * P + pr] = -sgn
+                    blocks.append(J.reshape(8 * P, nv))
+            return np.concatenate(blocks)
+
         bounds = ([(v - trust, v + trust) for v in C.ravel()] + [(-3 * trust, 3 * trust)] * (3 * n) +
                   [(L - 0.2, L + 0.01)] + [(-0.3, 0.3)] * (2 * P) + [(None, None)] * P)
+        if return_funcs:
+            return cons, cons_jac, z0, bounds
+        con = {'type': 'ineq', 'fun': cons}
+        if jac == 'analytic':
+            con['jac'] = cons_jac
         res = minimize(lambda z: z[iL], z0, jac=lambda z: np.eye(nv)[iL], method='SLSQP', bounds=bounds,
-                       constraints=[{'type': 'ineq', 'fun': cons}], options={'maxiter': 300, 'ftol': 1e-15})
+                       constraints=[con], options={'maxiter': 300, 'ftol': 1e-15})
         z = res.x
         Cn = z[:3 * n].reshape(n, 3); Ph = z[3 * n:6 * n].reshape(n, 3)
         Rn = [rod(Ph[i]) @ R[i] for i in range(n)]
@@ -163,5 +232,5 @@ if __name__ == '__main__':
     C, R = from_frame(conf)
     t0 = time.time()
     s0, _, C0 = certify(C, R)
-    L, C1, R1, hist = solve(C0, R, s0, verbose=True)
+    L, C1, R1, hist = solve(C0, R, s0, verbose=True, jac=sys.argv[2] if len(sys.argv) > 2 else 'analytic')
     print(f'start {s0:.12f} -> {L:.12f} ({time.time() - t0:.1f}s)')
